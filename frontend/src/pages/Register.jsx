@@ -46,7 +46,7 @@ function Register() {
     e.preventDefault();
     try {
       const result = await fetch(
-        "http://localhost:5000/api/auth/registration",
+        "https://linkpad-q82m.onrender.com/api/auth/registration",
         {
           method: "POST",
           headers: {

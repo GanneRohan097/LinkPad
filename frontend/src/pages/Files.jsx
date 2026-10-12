@@ -4,7 +4,7 @@ import FileCard from "../Components/files/FileCard";
 import FileFilters from "../Components/files/FileFilters";
 import FileList from "../Components/files/FileList";
 
-const API_URL = "http://localhost:5000/api/files";
+const API_URL = "https://linkpad-q82m.onrender.com/api/files";
 
 const getFileKind = (name) => {
   const extension = name.split(".").pop().toLowerCase();
