@@ -30,6 +30,7 @@ function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
+const [error,setError] = useState(false);
 async function handleLogin(e) {
   e.preventDefault();
   try{
@@ -45,7 +46,8 @@ async function handleLogin(e) {
   })
   const data = await response.json();
   if(!response.ok){
-    console.log("Invalid credentials");
+    console.log("Invalid credentials or account doesnot exists");
+    setError(true);
     return;
   }
   console.log(data)
@@ -170,7 +172,7 @@ catch(err){
                       Forgot password?
                     </button>
                   </div>
-
+                   {error && <p className="text-red-600 font-bold">Invalid credentials or account doesn't exists</p>}
                   <button
                     type="submit"
                     className="w-full rounded-md border-2 border-[#14213D] bg-[#2F4BFF] py-3.5 text-base font-bold text-white shadow-[4px_4px_0_#14213D] transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[6px_6px_0_#14213D] active:translate-x-1 active:translate-y-1 active:shadow-none focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-[#FFD23F]"
