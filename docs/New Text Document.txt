@@ -1,0 +1,143 @@
+## Database Entities
+
+For the current LinkPad MVP, the system requires four primary entities:
+
+```text
+User
+File
+Note
+Task
+```
+
+### Entity Relationship
+
+```text
+                 USER
+                  │
+        ┌─────────┼─────────┐
+        │         │         │
+        ↓         ↓         ↓
+      FILES     NOTES      TASKS
+```
+
+A single user can have multiple files, notes, and tasks.
+
+```text
+User 1 ──── N File
+User 1 ──── N Note
+User 1 ──── N Task
+```
+
+### User
+
+Represents a LinkPad account.
+
+The user is the owner of all personal resources in the system.
+
+Conceptually:
+
+```text
+User
+├── id
+├── name
+├── email
+├── password
+└── created_at
+```
+
+### File
+
+Represents a file uploaded by a user.
+
+The actual file content will be stored in PostgreSQL.
+
+Conceptually:
+
+```text
+File
+├── id
+├── user_id
+├── file_name
+├── mime_type
+├── file_size
+├── file_data
+└── created_at
+```
+
+`user_id` identifies the owner of the file.
+
+### Note
+
+Represents a personal note created by a user.
+
+Conceptually:
+
+```text
+Note
+├── id
+├── user_id
+├── title
+├── content
+├── is_pinned
+├── created_at
+└── updated_at
+```
+
+### Task
+
+Represents a personal task created by a user.
+
+Conceptually:
+
+```text
+Task
+├── id
+├── user_id
+├── title
+├── description
+├── status
+├── priority
+├── due_date
+├── created_at
+└── updated_at
+```
+
+### Ownership Model
+
+Every user-owned resource contains a reference to its owner:
+
+```text
+File.user_id → User.id
+Note.user_id → User.id
+Task.user_id → User.id
+```
+
+This establishes the fundamental ownership rule:
+
+> A user can access only resources belonging to their own account.
+
+For example, when retrieving files:
+
+```text
+Authenticated User
+        ↓
+      user_id
+        ↓
+SELECT files
+WHERE user_id = authenticated_user_id
+```
+
+The backend must enforce this ownership rule for every protected resource.
+
+### Current MVP Entity Scope
+
+Only the following entities are required at this stage:
+
+```text
+User
+File
+Note
+Task
+```
+
+Additional entities should be introduced only when a future requirement actually requires them.

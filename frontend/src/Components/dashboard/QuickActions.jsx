@@ -1,0 +1,26 @@
+import { ArrowUpFromLine, CheckSquare, FilePlus2, Smartphone } from "lucide-react";
+
+const actions = [
+  { label: "Upload file", description: "Add something to your files", icon: ArrowUpFromLine },
+  { label: "Create note", description: "Capture an idea", icon: FilePlus2 },
+  { label: "Add task", description: "Keep track of what's next", icon: CheckSquare },
+  { label: "Connect device", description: "Bring another device online", icon: Smartphone },
+];
+
+function QuickActions() {
+  return (
+    <section>
+      <div className="mb-3 flex items-center justify-between"><h2 className="text-sm font-semibold text-slate-900">Quick actions</h2></div>
+      <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
+        {actions.map(({ label, description, icon: Icon }) => (
+          <button key={label} className="group flex min-h-[86px] items-center gap-3 rounded-xl border border-slate-200 bg-white p-4 text-left" type="button">
+            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-blue-50 text-blue-700"><Icon size={19} strokeWidth={1.9} /></span>
+            <span className="min-w-0"><span className="block text-sm font-medium text-slate-800">{label}</span><span className="mt-1 block text-xs leading-4 text-slate-500">{description}</span></span>
+          </button>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+export default QuickActions;
