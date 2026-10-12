@@ -4,8 +4,11 @@ import RecentFiles from "../Components/dashboard/RecentFiles";
 import ConnectedDevices from "../Components/dashboard/ConnectedDevices";
 import PinnedNotes from "../Components/dashboard/PinnedNotes";
 import RecentActivity from "../Components/dashboard/RecentActivity";
+import { useEffect } from "react";
 
 function Dashboard() {
+  const user = JSON.parse(localStorage.getItem("user"))
+  const name = user.user.name
   return (
     <div className="space-y-8">
       <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
@@ -21,7 +24,7 @@ function Dashboard() {
               .replace(",", "")}
           </p>
           <h1 className="text-[26px] font-semibold tracking-tight text-slate-900 sm:text-[30px]">
-            Your Workspace
+            {name}'s Workspace
           </h1>
           <p className="mt-1.5 text-sm text-slate-500">
             Everything you need, right where you left it.
