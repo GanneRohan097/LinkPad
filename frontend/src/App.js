@@ -1,7 +1,6 @@
 import { Routes, Route, Navigate, Outlet, useNavigate, useLocation } from "react-router-dom";
 import Sidebar from "./Components/layout/Sidebar";
 import MobileNavbar from "./Components/layout/MobileNavbar";
-import Topbar from "./Components/layout/Topbar";
 import Dashboard from "./pages/Dashboard";
 import FilesPage from "./pages/Files";
 import Notes from "./pages/Notes";
@@ -33,7 +32,6 @@ function Layout() {
     <div className="min-h-screen bg-slate-50 text-slate-800">
       <Sidebar activePage={page} onNavigate={goTo} />
       <div className="min-h-screen lg:pl-64">
-        <Topbar context={page} />
         <main className="mx-auto max-w-[1440px] px-4 py-7 pb-24 sm:px-7 sm:py-8 lg:px-9">
           <Outlet />
         </main>
