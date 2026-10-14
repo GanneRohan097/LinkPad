@@ -1,3 +1,4 @@
+
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Plus } from "lucide-react";
 import FileCard from "../Components/files/FileCard";
@@ -107,7 +108,6 @@ function FilesPage() {
 
   const addFiles = async (event) => {
     const selectedFiles = Array.from(event.target.files || []);
-
     event.target.value = "";
 
     if (!selectedFiles.length) return;
@@ -141,7 +141,7 @@ function FilesPage() {
 
         if (!response.ok || !result.success) {
           throw new Error(
-            `${file.name}: ${result.message || "Upload failed."}`,
+            `${file.name}: ${result.message || "Upload failed."}`
           );
         }
 
@@ -151,7 +151,7 @@ function FilesPage() {
       setMessage(
         uploadedCount === 1
           ? "File uploaded successfully."
-          : `${uploadedCount} files uploaded successfully.`,
+          : `${uploadedCount} files uploaded successfully.`
       );
 
       await fetchFiles();
@@ -258,31 +258,31 @@ function FilesPage() {
     return filtered;
   }, [items, search, sort, type]);
 
-const removeFile = async (file) => {
-  try {
-    const token = localStorage.getItem("token");
+  const removeFile = async (file) => {
+    try {
+      const token = localStorage.getItem("token");
 
-    const response = await fetch(`${API_URL}/${file.id}`, {
-      method: "DELETE",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+      const response = await fetch(`${API_URL}/${file.id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
-    const result = await response.json();
+      const result = await response.json();
 
-    if (!response.ok) {
-      throw new Error(result.message || "Failed to delete file");
+      if (!response.ok) {
+        throw new Error(result.message || "Failed to delete file");
+      }
+
+      setItems((prevItems) =>
+        prevItems.filter((item) => item.id !== file.id)
+      );
+    } catch (error) {
+      console.error("Delete error:", error);
+      alert(error.message || "Failed to delete file");
     }
-
-    setItems((prevItems) =>
-      prevItems.filter((item) => item.id !== file.id)
-    );
-  } catch (error) {
-    console.error("Delete error:", error);
-    alert(error.message || "Failed to delete file");
-  }
-};
+  };
 
   return (
     <div className="space-y-8">
@@ -296,11 +296,11 @@ const removeFile = async (file) => {
 
       <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
         <div>
-          <h1 className="text-[30px] font-semibold tracking-tight text-slate-900 sm:text-[36px]">
+          <h1 className="text-[30px] font-semibold tracking-tight text-slate-900 dark:text-slate-100 sm:text-[36px]">
             Files
           </h1>
 
-          <p className="mt-2 text-base text-slate-500">
+          <p className="mt-2 text-base text-slate-500 dark:text-slate-400">
             All your files, together and in sync.
           </p>
         </div>
@@ -330,7 +330,7 @@ const removeFile = async (file) => {
       {error && (
         <div
           role="alert"
-          className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+          className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-900 dark:bg-red-950 dark:text-red-300"
         >
           {error}
         </div>
@@ -339,25 +339,25 @@ const removeFile = async (file) => {
       {message && (
         <div
           role="status"
-          className="rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700"
+          className="rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700 dark:border-green-900 dark:bg-green-950 dark:text-green-300"
         >
           {message}
         </div>
       )}
 
       <div className="flex items-center justify-between">
-        <p className="text-base font-medium text-slate-700">
+        <p className="text-base font-medium text-slate-700 dark:text-slate-200">
           All files{" "}
           <span className="ml-1.5 text-sm font-normal text-slate-400">
             {visibleFiles.length} items
           </span>
         </p>
 
-        <p className="text-sm text-slate-500">{sort}</p>
+        <p className="text-sm text-slate-500 dark:text-slate-400">{sort}</p>
       </div>
 
       {loading ? (
-        <div className="rounded-2xl border border-slate-200 bg-white p-14 text-center text-base text-slate-500">
+        <div className="rounded-2xl border border-slate-200 bg-white p-14 text-center text-base text-slate-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-400">
           Loading your files...
         </div>
       ) : visibleFiles.length ? (
@@ -380,7 +380,7 @@ const removeFile = async (file) => {
           />
         )
       ) : (
-        <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-14 text-center text-base text-slate-500">
+        <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-14 text-center text-base text-slate-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-400">
           {search || type !== "All file types"
             ? "No files match your search."
             : "No files uploaded yet. Upload your first file to get started."}

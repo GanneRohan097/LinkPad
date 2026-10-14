@@ -28,7 +28,7 @@ function FileCard({ file, onRemove, onDownload }) {
   const Icon = fileIcons[file.kind] || FileText;
 
   return (
-    <article className="rounded-2xl border border-slate-200 bg-white p-6">
+    <article className="rounded-2xl border border-slate-200 bg-white p-6 transition-colors dark:border-slate-700 dark:bg-slate-900">
       <div className="flex items-start justify-between">
         <span
           className={`grid h-14 w-14 place-items-center rounded-xl ${
@@ -41,7 +41,7 @@ function FileCard({ file, onRemove, onDownload }) {
         <div className="flex items-center gap-1">
           <button
             aria-label={`Download ${file.name}`}
-            className="grid h-10 w-10 place-items-center rounded-lg text-slate-400 hover:bg-blue-50 hover:text-blue-600"
+            className="grid h-10 w-10 place-items-center rounded-lg text-slate-400 hover:bg-blue-50 hover:text-blue-600 dark:hover:bg-blue-950 dark:hover:text-blue-400"
             onClick={() => onDownload(file)}
             title="Download file"
             type="button"
@@ -51,7 +51,7 @@ function FileCard({ file, onRemove, onDownload }) {
 
           <button
             aria-label={`Remove ${file.name}`}
-            className="grid h-10 w-10 place-items-center rounded-lg text-slate-400 hover:text-rose-600"
+            className="grid h-10 w-10 place-items-center rounded-lg text-slate-400 hover:bg-rose-50 hover:text-rose-600 dark:hover:bg-rose-950 dark:hover:text-rose-400"
             onClick={() => onRemove(file)}
             title="Remove file"
             type="button"
@@ -61,13 +61,15 @@ function FileCard({ file, onRemove, onDownload }) {
         </div>
       </div>
 
-      <h2 className="mt-5 truncate text-base font-medium text-slate-800">
+      <h2 className="mt-5 truncate text-base font-medium text-slate-800 dark:text-slate-100">
         {file.name}
       </h2>
 
-      <p className="mt-1.5 text-sm text-slate-500">{file.size}</p>
+      <p className="mt-1.5 text-sm text-slate-500 dark:text-slate-400">
+        {file.size}
+      </p>
 
-      <div className="mt-5 flex items-center justify-between border-t border-slate-100 pt-4 text-xs text-slate-500">
+      <div className="mt-5 flex items-center justify-between border-t border-slate-100 pt-4 text-xs text-slate-500 dark:border-slate-700 dark:text-slate-400">
         <span>{file.time}</span>
       </div>
     </article>

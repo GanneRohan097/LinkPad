@@ -3,7 +3,6 @@ import { getDeviceInfo } from "../utils/device";
 
 function Devices() {
   const info = getDeviceInfo();
-  console.log(info)
 
   const currentDevice = {
     name: info.name,
@@ -15,19 +14,23 @@ function Devices() {
 
   return (
     <div className="space-y-7">
+      {/* Header */}
       <div>
-        <h1 className="text-[26px] font-semibold tracking-tight text-slate-900 sm:text-[30px]">
+        <h1 className="text-[26px] font-semibold tracking-tight text-slate-900 dark:text-slate-100 sm:text-[30px]">
           Devices
         </h1>
-        <p className="mt-1.5 text-sm text-slate-500">
+        <p className="mt-1.5 text-sm text-slate-500 dark:text-slate-400">
           Your LinkPad workspace, wherever you are.
         </p>
       </div>
 
+      {/* Signed-in devices */}
       <section>
         <div className="mb-3">
-          <h2 className="text-sm font-semibold text-slate-900">Signed in on</h2>
-          <p className="mt-1 text-xs text-slate-500">
+          <h2 className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+            Signed in on
+          </h2>
+          <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
             Devices signed in to your account.
           </p>
         </div>

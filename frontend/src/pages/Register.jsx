@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+
 const tabs = [
   {
     color: "#2F4BFF",
@@ -20,9 +20,10 @@ const tabs = [
 ];
 
 const field =
-  "w-full border-0 border-b-2 border-[#14213D]/25 bg-transparent px-1 py-2.5 text-base text-[#14213D] outline-none transition-colors placeholder:text-[#14213D]/35 focus:border-[#14213D] focus:bg-[#FFF3B0]";
+  "w-full border-0 border-b-2 border-[#14213D]/25 bg-transparent px-1 py-2.5 text-base text-[#14213D] outline-none transition-colors placeholder:text-[#14213D]/35 focus:border-[#14213D] focus:bg-[#FFF3B0] dark:border-slate-600 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:border-blue-400 dark:focus:bg-slate-800";
 
-const label = "block text-sm font-semibold text-[#14213D]/70";
+const label =
+  "block text-sm font-semibold text-[#14213D]/70 dark:text-slate-300";
 
 function Wordmark() {
   return (
@@ -30,7 +31,7 @@ function Wordmark() {
       <span className="grid h-8 w-8 place-items-center rounded-md bg-[#2F4BFF]">
         <span className="h-3.5 w-3.5 rounded-sm border-2 border-white" />
       </span>
-      <span className="text-xl font-extrabold tracking-tight text-[#14213D]">
+      <span className="text-xl font-extrabold tracking-tight text-[#14213D] dark:text-slate-100">
         LinkPad
       </span>
     </div>
@@ -41,9 +42,15 @@ function Register() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+
   async function handleRegistration(e) {
     e.preventDefault();
+    setError("");
+    setLoading(true);
+
     try {
       const result = await fetch(
         "https://linkpad-q82m.onrender.com/api/auth/registration",
@@ -52,34 +59,36 @@ function Register() {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({
-            name,
-            email,
-            password,
-          }),
-        },
+          body: JSON.stringify({ name, email, password }),
+        }
       );
+
       const data = await result.json();
-      console.log(data)
+
       if (!result.ok) {
-        console.log("Registration failed");
+        setError(data.message || "Registration failed. Please try again.");
         return;
       }
+
       navigate("/login");
     } catch (error) {
-      console.log("Unable to connect server");
+      setError("Unable to connect to the server. Please try again.");
+    } finally {
+      setLoading(false);
     }
   }
+
   return (
     <div
-      className="min-h-screen bg-[#E9EEF5] text-[#14213D] lg:grid lg:grid-cols-[5fr_6fr]"
+      className="min-h-screen bg-[#E9EEF5] text-[#14213D] transition-colors dark:bg-slate-950 dark:text-slate-100 lg:grid lg:grid-cols-[5fr_6fr]"
       style={{
         fontFamily: "'Bricolage Grotesque', system-ui, sans-serif",
-        backgroundImage: "radial-gradient(#14213D22 1px, transparent 1px)",
+        backgroundImage:
+          "radial-gradient(#14213D22 1px, transparent 1px)",
         backgroundSize: "22px 22px",
       }}
     >
-      {/* Left: what a pad holds */}
+      {/* Left section */}
       <section className="hidden flex-col justify-between px-14 py-12 lg:flex">
         <Wordmark />
 
@@ -87,7 +96,8 @@ function Register() {
           <h1 className="text-5xl font-extrabold leading-[1.05] tracking-tight">
             Start a pad that follows you around.
           </h1>
-          <p className="mt-5 text-lg leading-relaxed text-[#14213D]/70">
+
+          <p className="mt-5 text-lg leading-relaxed text-[#14213D]/70 dark:text-slate-300">
             One login keeps your files, notes and tasks together, on every
             device you sign in from.
           </p>
@@ -96,27 +106,30 @@ function Register() {
             {tabs.map((t) => (
               <div
                 key={t.name}
-                className="flex overflow-hidden rounded-md bg-white/70"
+                className="flex overflow-hidden rounded-md bg-white/70 dark:bg-slate-900"
               >
                 <span
                   className="w-2 shrink-0"
                   style={{ background: t.color }}
                 />
+
                 <div className="px-4 py-3">
                   <p className="font-semibold">{t.name}</p>
-                  <p className="text-sm text-[#14213D]/65">{t.text}</p>
+                  <p className="text-sm text-[#14213D]/65 dark:text-slate-400">
+                    {t.text}
+                  </p>
                 </div>
               </div>
             ))}
           </div>
         </div>
 
-        <p className="text-sm text-[#14213D]/50">
+        <p className="text-sm text-[#14213D]/50 dark:text-slate-500">
           LinkPad, a personal workspace project.
         </p>
       </section>
 
-      {/* Right: the pad */}
+      {/* Registration form */}
       <section className="flex items-center justify-center px-5 py-12 sm:px-8">
         <div className="w-full max-w-md">
           <div className="mb-8 lg:hidden">
@@ -124,14 +137,12 @@ function Register() {
           </div>
 
           <div className="relative">
-            {/* sheets underneath */}
-            <div className="absolute inset-0 -rotate-2 rounded-md border border-[#14213D]/20 bg-white" />
-            <div className="absolute inset-0 rotate-[1.5deg] rounded-md border border-[#14213D]/20 bg-white" />
+            <div className="absolute inset-0 -rotate-2 rounded-md border border-[#14213D]/20 bg-white dark:border-slate-700 dark:bg-slate-900" />
 
-            {/* top sheet */}
-            <div className="relative overflow-hidden rounded-md border-2 border-[#14213D] bg-white">
-              {/* binding strip */}
-              <div className="flex h-9 items-center justify-around bg-[#14213D] px-10">
+            <div className="absolute inset-0 rotate-[1.5deg] rounded-md border border-[#14213D]/20 bg-white dark:border-slate-700 dark:bg-slate-900" />
+
+            <div className="relative overflow-hidden rounded-md border-2 border-[#14213D] bg-white dark:border-slate-700 dark:bg-slate-900">
+              <div className="flex h-9 items-center justify-around bg-[#14213D] px-10 dark:bg-slate-800">
                 <span className="h-3 w-3 rounded-full bg-[#E9EEF5]" />
                 <span className="h-3 w-3 rounded-full bg-[#E9EEF5]" />
                 <span className="h-3 w-3 rounded-full bg-[#E9EEF5]" />
@@ -141,7 +152,8 @@ function Register() {
                 <h2 className="text-3xl font-extrabold tracking-tight">
                   Open a new pad
                 </h2>
-                <p className="mt-1.5 text-sm text-[#14213D]/65">
+
+                <p className="mt-1.5 text-sm text-[#14213D]/65 dark:text-slate-400">
                   Takes a minute. You can sign in from any device afterwards.
                 </p>
 
@@ -149,9 +161,12 @@ function Register() {
                   <div>
                     <label className={label}>Your name</label>
                     <input
+                      required
+                      autoComplete="name"
+                      value={name}
                       onChange={(e) => setName(e.target.value)}
                       type="text"
-                      placeholder="Rohan"
+                      placeholder="Your name"
                       className={field}
                     />
                   </div>
@@ -159,18 +174,23 @@ function Register() {
                   <div>
                     <label className={label}>Email</label>
                     <input
+                      required
+                      autoComplete="email"
+                      value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       type="email"
-                      placeholder="rohan@example.com"
+                      placeholder="you@example.com"
                       className={field}
                     />
                   </div>
 
                   <div>
-                    <div className="flex items-baseline justify-between">
-                      <label className={label}>Password</label>
-                    </div>
+                    <label className={label}>Password</label>
                     <input
+                      required
+                      minLength={8}
+                      autoComplete="new-password"
+                      value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       type="password"
                       placeholder="At least 8 characters"
@@ -178,19 +198,26 @@ function Register() {
                     />
                   </div>
 
+                  {error && (
+                    <p role="alert" className="text-sm font-medium text-red-600 dark:text-red-400">
+                      {error}
+                    </p>
+                  )}
+
                   <button
+                    disabled={loading}
                     type="submit"
-                    className="w-full rounded-md border-2 border-[#14213D] bg-[#2F4BFF] py-3.5 text-base font-bold text-white shadow-[4px_4px_0_#14213D] transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[6px_6px_0_#14213D] active:translate-x-1 active:translate-y-1 active:shadow-none focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-[#FFD23F]"
+                    className="w-full rounded-md border-2 border-[#14213D] bg-[#2F4BFF] py-3.5 text-base font-bold text-white shadow-[4px_4px_0_#14213D] transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[6px_6px_0_#14213D] active:translate-x-1 active:translate-y-1 active:shadow-none focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-[#FFD23F] disabled:cursor-not-allowed disabled:opacity-60"
                   >
-                    Create my pad
+                    {loading ? "Creating account..." : "Create my pad"}
                   </button>
                 </form>
 
-                <p className="mt-7 text-sm text-[#14213D]/70">
+                <p className="mt-7 text-sm text-[#14213D]/70 dark:text-slate-300">
                   Already have a pad?{" "}
                   <Link
                     to="/login"
-                    className="font-bold text-[#2F4BFF] underline underline-offset-4"
+                    className="font-bold text-[#2F4BFF] underline underline-offset-4 dark:text-blue-400"
                   >
                     Sign in
                   </Link>

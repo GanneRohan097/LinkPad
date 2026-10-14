@@ -2,12 +2,15 @@ import { Grid2X2, List, Search } from "lucide-react";
 
 function FileFilters({ search, onSearch, type, onType, sort, onSort, view, onView }) {
   return (
-    <div className="flex flex-col gap-3 rounded-2xl border border-slate-200 bg-white p-4 sm:flex-row sm:items-center">
+    <div className="flex flex-col gap-3 rounded-2xl border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900 sm:flex-row sm:items-center">
       <div className="relative min-w-0 flex-1">
-        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" size={19} />
+        <Search
+          className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"
+          size={19}
+        />
         <input
           aria-label="Search files"
-          className="h-12 w-full rounded-xl border border-slate-200 bg-white pl-11 pr-4 text-base outline-none placeholder:text-slate-400"
+          className="h-12 w-full rounded-xl border border-slate-200 bg-white pl-11 pr-4 text-base text-slate-800 outline-none placeholder:text-slate-400 focus:border-blue-500 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100 dark:placeholder:text-slate-500"
           placeholder="Search files"
           value={search}
           onChange={(event) => onSearch(event.target.value)}
@@ -17,7 +20,7 @@ function FileFilters({ search, onSearch, type, onType, sort, onSort, view, onVie
       <div className="grid grid-cols-2 gap-3 sm:flex">
         <select
           aria-label="Filter by file type"
-          className="h-12 rounded-xl border border-slate-200 bg-white px-4 text-sm text-slate-600"
+          className="h-12 rounded-xl border border-slate-200 bg-white px-4 text-sm text-slate-600 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-300"
           value={type}
           onChange={(event) => onType(event.target.value)}
         >
@@ -30,9 +33,10 @@ function FileFilters({ search, onSearch, type, onType, sort, onSort, view, onVie
           <option>Image</option>
           <option>Other</option>
         </select>
+
         <select
           aria-label="Sort files"
-          className="h-12 rounded-xl border border-slate-200 bg-white px-4 text-sm text-slate-600"
+          className="h-12 rounded-xl border border-slate-200 bg-white px-4 text-sm text-slate-600 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-300"
           value={sort}
           onChange={(event) => onSort(event.target.value)}
         >
@@ -43,20 +47,29 @@ function FileFilters({ search, onSearch, type, onType, sort, onSort, view, onVie
         </select>
       </div>
 
-      <div className="hidden items-center rounded-xl border border-slate-200 p-1 sm:flex">
+      <div className="hidden items-center rounded-xl border border-slate-200 p-1 dark:border-slate-700 sm:flex">
         <button
           aria-label="Grid view"
           aria-pressed={view === "grid"}
-          className={`grid h-10 w-10 place-items-center rounded-lg ${view === "grid" ? "bg-blue-50 text-blue-700" : "text-slate-400"}`}
+          className={`grid h-10 w-10 place-items-center rounded-lg ${
+            view === "grid"
+              ? "bg-blue-50 text-blue-700 dark:bg-blue-950 dark:text-blue-400"
+              : "text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800"
+          }`}
           onClick={() => onView("grid")}
           type="button"
         >
           <Grid2X2 size={19} />
         </button>
+
         <button
           aria-label="List view"
           aria-pressed={view === "list"}
-          className={`grid h-10 w-10 place-items-center rounded-lg ${view === "list" ? "bg-blue-50 text-blue-700" : "text-slate-400"}`}
+          className={`grid h-10 w-10 place-items-center rounded-lg ${
+            view === "list"
+              ? "bg-blue-50 text-blue-700 dark:bg-blue-950 dark:text-blue-400"
+              : "text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800"
+          }`}
           onClick={() => onView("list")}
           type="button"
         >
