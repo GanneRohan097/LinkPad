@@ -1,22 +1,71 @@
-import { useMemo, useState } from "react";
-import { Plus, Search } from "lucide-react";
+
+import { useEffect, useMemo, useState } from "react";
+import { Plus, Search, X } from "lucide-react";
 import NoteCard from "../Components/notes/NoteCard";
 import NoteEditor from "../Components/notes/NoteEditor";
-import { notes } from "../data/mockData";
 
+//const API_URL = "http://localhost:5000/api/notes";
+const API_URL = "https://linkpad-q82m.onrender.com/api/notes";;
 function Notes() {
-  const [items, setItems] = useState(
-    notes.map((note) => ({ ...note, content: note.content || note.preview }))
-  );
+  const [items, setItems] = useState([]);
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState("All notes");
   const [sort, setSort] = useState("Recently updated");
   const [draft, setDraft] = useState(null);
-  const [editingTitle, setEditingTitle] = useState(null);
+  const [isEditorOpen, setIsEditorOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    const fetchNotes = async () => {
+      try {
+        const token = localStorage.getItem("token");
+
+        if (!token) {
+          throw new Error("Please log in to view your notes.");
+        }
+
+        const response = await fetch(`${API_URL}/getNotes`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(
+            data.message || data.Message || "Failed to load notes"
+          );
+        }
+
+        setItems(
+          (data.notesList || data.Result || []).map((note) => ({
+            ...note,
+            pinned: note.is_pinned,
+            updated: note.updated_at
+              ? new Date(note.updated_at).toLocaleString()
+              : "Just now",
+            preview: note.content,
+            color: "blue",
+          }))
+        );
+      } catch (err) {
+        setError(err.message || "Failed to load notes");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchNotes();
+  }, []);
 
   const visibleNotes = useMemo(() => {
     let filtered = items.filter((note) =>
-      `${note.title} ${note.content}`.toLowerCase().includes(query.toLowerCase())
+      `${note.title} ${note.content || ""}`
+        .toLowerCase()
+        .includes(query.toLowerCase())
     );
 
     if (filter === "Pinned") {
@@ -24,7 +73,9 @@ function Notes() {
     }
 
     if (sort === "Title A–Z") {
-      return filtered.sort((a, b) => a.title.localeCompare(b.title));
+      return filtered
+        .slice()
+        .sort((a, b) => a.title.localeCompare(b.title));
     }
 
     if (sort === "Oldest updated") {
@@ -35,7 +86,7 @@ function Notes() {
   }, [items, query, filter, sort]);
 
   const startNewNote = () => {
-    setEditingTitle(null);
+    setError("");
     setDraft({
       title: "",
       content: "",
@@ -43,42 +94,94 @@ function Notes() {
       color: "blue",
       updated: "Just now",
     });
+    setIsEditorOpen(true);
   };
 
-  const selectNote = (note) => {
-    setEditingTitle(note.title);
-    setDraft({ ...note });
-  };
-
-  const updateDraft = (field, value) =>
-    setDraft((current) => ({ ...current, [field]: value }));
-
-  const saveNote = () => {
-    if (!draft || !draft.title.trim()) return;
-
-    const saved = {
-      ...draft,
-      title: draft.title.trim(),
-      preview: draft.content,
-      updated: "Updated just now",
-    };
-
-    setItems((current) =>
-      editingTitle
-        ? current.map((note) => (note.title === editingTitle ? saved : note))
-        : [saved, ...current]
-    );
-
+  const closeEditor = () => {
+    if (saving) return;
+    setIsEditorOpen(false);
     setDraft(null);
-    setEditingTitle(null);
   };
 
-  const togglePin = (title) =>
+  const updateDraft = (field, value) => {
+    setDraft((current) => ({ ...current, [field]: value }));
+  };
+
+  const saveNote = async () => {
+    if (!draft || !draft.title.trim() || saving) return;
+
+    try {
+      setSaving(true);
+      setError("");
+
+      const token = localStorage.getItem("token");
+
+      if (!token) {
+        throw new Error("Please log in to save your note.");
+      }
+
+      const response = await fetch(`${API_URL}/create`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          title: draft.title.trim(),
+          content: draft.content,
+          is_pinned: draft.pinned,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (
+        !response.ok ||
+        data.Status === "Failed" ||
+        data.success === false
+      ) {
+        throw new Error(
+          data.Message || data.message || "Failed to create note"
+        );
+      }
+
+      const savedNote = data.Result || data.note;
+
+      if (!savedNote) {
+        throw new Error(
+          "The API did not return the created note. Check the backend response."
+        );
+      }
+
+      setItems((current) => [
+        {
+          ...savedNote,
+          pinned: savedNote.is_pinned,
+          preview: savedNote.content,
+          color: "blue",
+          updated: savedNote.updated_at
+            ? new Date(savedNote.updated_at).toLocaleString()
+            : "Just now",
+        },
+        ...current,
+      ]);
+
+      setIsEditorOpen(false);
+      setDraft(null);
+    } catch (err) {
+      setError(err.message || "Failed to save note");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const togglePin = (id) => {
     setItems((current) =>
       current.map((note) =>
-        note.title === title ? { ...note, pinned: !note.pinned } : note
+        note.id === id ? { ...note, pinned: !note.pinned } : note
       )
     );
+  };
 
   const controlStyle =
     "h-10 w-full min-w-0 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-600 outline-none focus:border-blue-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300";
@@ -144,18 +247,30 @@ function Notes() {
         </select>
       </div>
 
+      {error && (
+        <div
+          role="alert"
+          className="rounded-lg bg-red-50 p-3 text-sm text-red-600 dark:bg-red-950 dark:text-red-300"
+        >
+          {error}
+        </div>
+      )}
+
       {/* Notes grid */}
-      {visibleNotes.length ? (
+      {loading ? (
+        <p className="text-sm text-slate-500 dark:text-slate-400">
+          Loading notes...
+        </p>
+      ) : visibleNotes.length ? (
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
           {visibleNotes.map((note) => (
             <NoteCard
-              key={note.title}
+              key={note.id}
               note={note}
-              onSelect={selectNote}
-              onTogglePin={togglePin}
-              onDelete={(titleToDelete) =>
+              onTogglePin={() => togglePin(note.id)}
+              onDelete={() =>
                 setItems((current) =>
-                  current.filter((item) => item.title !== titleToDelete)
+                  current.filter((item) => item.id !== note.id)
                 )
               }
             />
@@ -163,39 +278,81 @@ function Notes() {
         </div>
       ) : (
         <div className="rounded-xl border border-dashed border-slate-300 bg-white p-10 text-center text-sm text-slate-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-400">
-          No notes match your search.
+          {items.length
+            ? "No notes match your search."
+            : "No notes yet. Create your first note."}
         </div>
       )}
 
-      {/* Notes information and editor */}
-      <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_minmax(320px,0.8fr)]">
-        <div className="rounded-xl border border-dashed border-slate-300 bg-white p-5 dark:border-slate-700 dark:bg-slate-900">
-          <p className="text-sm font-medium text-slate-700 dark:text-slate-200">
-            Your notes stay in sync
-          </p>
-          <p className="mt-1 text-sm leading-6 text-slate-500 dark:text-slate-400">
-            Pick up where you left off from any connected device. Your pinned
-            notes are always easy to find.
-          </p>
-        </div>
-
-        {draft ? (
-          <NoteEditor
-            note={draft}
-            onChange={updateDraft}
-            onPin={() => updateDraft("pinned", !draft.pinned)}
-            onSave={saveNote}
-            onCancel={() => {
-              setDraft(null);
-              setEditingTitle(null);
-            }}
-          />
-        ) : (
-          <div className="flex min-h-48 items-center justify-center rounded-xl border border-dashed border-slate-300 bg-white p-5 text-center text-sm text-slate-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-400">
-            Select a note to edit, or create a new note.
-          </div>
-        )}
+      {/* Information panel */}
+      <div className="rounded-xl border border-dashed border-slate-300 bg-white p-5 dark:border-slate-700 dark:bg-slate-900">
+        <p className="text-sm font-medium text-slate-700 dark:text-slate-200">
+          Your notes stay in sync
+        </p>
+        <p className="mt-1 text-sm leading-6 text-slate-500 dark:text-slate-400">
+          Pick up where you left off from any connected device. Your pinned
+          notes are always easy to find.
+        </p>
       </div>
+
+      {/* Responsive create-note modal */}
+      {isEditorOpen && draft && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-3 sm:p-6"
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget) {
+              closeEditor();
+            }
+          }}
+        >
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="note-editor-title"
+            className="flex max-h-[90dvh] w-full max-w-2xl flex-col overflow-y-auto rounded-2xl border border-slate-200 bg-white shadow-2xl dark:border-slate-700 dark:bg-slate-900"
+          >
+            <div className="sticky top-0 z-10 flex items-center justify-between gap-3 border-b border-slate-200 bg-white px-4 py-4 dark:border-slate-700 dark:bg-slate-900 sm:px-6">
+              <div>
+                <h2
+                  id="note-editor-title"
+                  className="text-lg font-semibold text-slate-900 dark:text-slate-100 sm:text-xl"
+                >
+                  Create a note
+                </h2>
+                <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                  Write down your thoughts and ideas.
+                </p>
+              </div>
+
+              <button
+                type="button"
+                onClick={closeEditor}
+                disabled={saving}
+                aria-label="Close note editor"
+                className="rounded-lg p-2 text-slate-500 hover:bg-slate-100 disabled:opacity-50 dark:text-slate-300 dark:hover:bg-slate-800"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <div className="p-4 sm:p-6">
+              <NoteEditor
+                note={draft}
+                onChange={updateDraft}
+                onPin={() => updateDraft("pinned", !draft.pinned)}
+                onSave={saveNote}
+                onCancel={closeEditor}
+              />
+
+              {saving && (
+                <p className="mt-3 text-sm text-slate-500 dark:text-slate-400">
+                  Saving note...
+                </p>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

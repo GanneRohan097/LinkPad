@@ -9,7 +9,9 @@ const PORT = process.env.PORT || 5000;
 app.use(cors())
 app.use(express.json());
 const fileRoutes = require("./routes/fileRoutes");
+const notesRoutes = require("./routes/notesRoutes")
 app.use("/api/files", fileRoutes);
+app.use("/api/notes",notesRoutes)
 app.get("/",(req,res)=>{
     res.json({
         message:"LinkPad is running",
