@@ -14,7 +14,7 @@ function Devices() {
         const token = localStorage.getItem("token");
 
         const response = await fetch(
-          "https:/linkpad-q82m.onrender.com/api/devices",
+          "https://linkpad-q82m.onrender.com/api/devices",
           {
             headers: {
               Authorization: `Bearer ${token}`,
