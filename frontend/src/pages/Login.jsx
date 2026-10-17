@@ -1,16 +1,30 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { getDeviceInfo } from "../utils/device";
 
 const tabs = [
-  { color: "#2F4BFF", name: "Files", text: "Your files stay ready wherever you sign in." },
-  { color: "#FFD23F", name: "Notes", text: "Pick up your notes from any device." },
-  { color: "#FF6B57", name: "Tasks", text: "Keep your work moving wherever you go." },
+  {
+    color: "#2F4BFF",
+    name: "Files",
+    text: "Your files stay ready wherever you sign in.",
+  },
+  {
+    color: "#FFD23F",
+    name: "Notes",
+    text: "Pick up your notes from any device.",
+  },
+  {
+    color: "#FF6B57",
+    name: "Tasks",
+    text: "Keep your work moving wherever you go.",
+  },
 ];
 
 const field =
   "w-full border-0 border-b-2 border-[#14213D]/25 bg-transparent px-1 py-2.5 text-base text-[#14213D] outline-none transition-colors placeholder:text-[#14213D]/35 focus:border-[#14213D] focus:bg-[#FFF3B0] dark:border-slate-600 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:border-blue-400 dark:focus:bg-slate-800";
 
-const label = "block text-sm font-semibold text-[#14213D]/70 dark:text-slate-300";
+const label =
+  "block text-sm font-semibold text-[#14213D]/70 dark:text-slate-300";
 
 function Wordmark() {
   return (
@@ -34,18 +48,31 @@ function Login() {
   async function handleLogin(e) {
     e.preventDefault();
     setError(false);
+    let deviceIdentifier = localStorage.getItem("deviceIdentifier");
 
+    if (!deviceIdentifier) {
+      deviceIdentifier = crypto.randomUUID();
+      localStorage.setItem("deviceIdentifier", deviceIdentifier);
+    }
+
+    const deviceInfo = getDeviceInfo();
     try {
-      const response = await fetch(
-        "https://linkpad-q82m.onrender.com/api/auth/login",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ email, password }),
-        }
-      );
+      //http://localhost:5000/api/auth/login 
+      const response = await fetch("https://linkpad-q82m.onrender.com/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email,
+          password,
+          deviceIdentifier,
+          deviceName: deviceInfo.name,
+          deviceType: deviceInfo.type,
+          browser: deviceInfo.browser,
+          os: deviceInfo.os,
+        }),
+      });
 
       const data = await response.json();
 
@@ -68,8 +95,7 @@ function Login() {
       className="min-h-screen bg-[#E9EEF5] text-[#14213D] transition-colors dark:bg-slate-950 dark:text-slate-100 lg:grid lg:grid-cols-[5fr_6fr]"
       style={{
         fontFamily: "'Bricolage Grotesque', system-ui, sans-serif",
-        backgroundImage:
-          "radial-gradient(#14213D22 1px, transparent 1px)",
+        backgroundImage: "radial-gradient(#14213D22 1px, transparent 1px)",
         backgroundSize: "22px 22px",
       }}
     >
@@ -83,8 +109,7 @@ function Login() {
           </h1>
 
           <p className="mt-5 text-lg leading-relaxed text-[#14213D]/70 dark:text-slate-300">
-            Sign in to access your files, notes and tasks from wherever you
-            are.
+            Sign in to access your files, notes and tasks from wherever you are.
           </p>
 
           <div className="mt-10 space-y-3">

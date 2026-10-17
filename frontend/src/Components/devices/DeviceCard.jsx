@@ -12,15 +12,7 @@ function DeviceCard({ device, onRemove }) {
           <Icon size={21} strokeWidth={1.8} />
         </span>
 
-        <button
-          aria-label={`Remove ${device.name}`}
-          className="grid h-8 w-8 place-items-center rounded-lg text-slate-400 hover:bg-rose-50 hover:text-rose-600 dark:hover:bg-rose-950/50 dark:hover:text-rose-400"
-          onClick={() => onRemove(device.name)}
-          title="Remove device"
-          type="button"
-        >
-          <MoreHorizontal size={18} />
-        </button>
+
       </div>
 
       <div className="mt-4 flex flex-wrap items-center gap-2">
@@ -28,20 +20,6 @@ function DeviceCard({ device, onRemove }) {
           {device.name}
         </h2>
 
-        <span
-          className={`flex items-center gap-1.5 text-[11px] font-medium ${
-            device.online
-              ? "text-emerald-700 dark:text-emerald-400"
-              : "text-slate-500 dark:text-slate-400"
-          }`}
-        >
-          <span
-            className={`h-1.5 w-1.5 rounded-full ${
-              device.online ? "bg-emerald-500" : "bg-slate-400"
-            }`}
-          />
-          {device.online ? "Online" : "Offline"}
-        </span>
       </div>
 
       <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
