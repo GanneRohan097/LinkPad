@@ -1,17 +1,16 @@
 
-import { useState } from "react";
+import { useState,useEffect } from "react";
 import {
-  Laptop,
+  Files,
+  HardDrive,
   LockKeyhole,
   Moon,
-  ShieldCheck,
-  Smartphone,
-  Sun,
-  UserRound,
+  Sun
 } from "lucide-react";
 import { useTheme } from "../context/ThemeContext";
 
 function Section({ title, description, children }) {
+
   return (
     <section className="border-b border-slate-100 px-5 py-5 last:border-b-0 dark:border-slate-700 sm:px-6">
       <div className="mb-4">
@@ -24,15 +23,33 @@ function Section({ title, description, children }) {
 }
 
 function Settings() {
+    const user = JSON.parse(localStorage.getItem("user"));
+    console.log(user)
+  const name = user.user.name;
+  const email = user.user.email;
+  const token = localStorage.getItem("token");
+  async function fetchStorage() {
+     const result = await fetch('https://linkpad-q82m.onrender.com/api/files/storage', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+     const data = await result.json();
+     setTotalSize(data.data.usedBytes);
+     setTotalFiles(data.data.totalFiles);
+  }
+  useEffect(()=>{
+       fetchStorage();
+  },[])
   const [profile, setProfile] = useState({
-    name: "Alex Morgan",
-    email: "alex.morgan@email.com",
+    name: name,
+    email: email,
   });
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(profile);
   const { theme, toggleTheme } = useTheme();
-  const [twoFactor, setTwoFactor] = useState(false);
-  const [securityMessage, setSecurityMessage] = useState("");
+  const [totalSize, setTotalSize] = useState(0);
+  const [totalFiles, setTotalFiles] = useState(0);
 
   const saveProfile = (event) => {
     event.preventDefault();
@@ -101,16 +118,7 @@ function Settings() {
                   <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">{profile.email}</p>
                 </div>
               </div>
-              <button
-                className="h-9 rounded-lg border border-slate-200 px-3 text-xs font-medium text-slate-700 dark:border-slate-600 dark:text-slate-200"
-                onClick={() => {
-                  setDraft(profile);
-                  setEditing(true);
-                }}
-                type="button"
-              >
-                Edit profile
-              </button>
+
             </div>
           )}
         </Section>
@@ -153,38 +161,39 @@ function Settings() {
           </div>
         </Section>
 
-        <Section title="Storage" description="Your files, notes, and attachments all count toward your plan.">
-          <div className="max-w-xl">
-            <div className="flex items-center justify-between text-xs">
-              <span className="font-medium text-slate-700 dark:text-slate-300">2.4 GB used</span>
-              <span className="text-slate-500 dark:text-slate-400">10 GB total</span>
-            </div>
-            <div className="mt-2 h-2 overflow-hidden rounded-full bg-slate-100 dark:bg-slate-700">
-              <div className="h-full w-[24%] rounded-full bg-blue-600" />
-            </div>
-            <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">7.6 GB of storage available</p>
-          </div>
-        </Section>
+<Section
+  title="File Storage"
+  description="View the storage used by your uploaded files."
+>
+  <div className="max-w-xl rounded-xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-800/50">
+    <div className="flex items-center gap-3">
+      <div className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-400">
+        <HardDrive size={21} />
+      </div>
 
-        <Section title="Connected devices" description="Devices currently linked to your workspace.">
-          <div className="flex flex-wrap items-center gap-5">
-            <div className="flex items-center gap-2.5">
-              <Laptop size={17} className="text-slate-500 dark:text-slate-400" />
-              <div>
-                <p className="text-xs font-medium text-slate-700 dark:text-slate-200">MacBook Pro</p>
-                <p className="text-[11px] text-emerald-700 dark:text-emerald-400">Online</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-2.5">
-              <Smartphone size={17} className="text-slate-500 dark:text-slate-400" />
-              <div>
-                <p className="text-xs font-medium text-slate-700 dark:text-slate-200">iPhone 15</p>
-                <p className="text-[11px] text-emerald-700 dark:text-emerald-400">Online</p>
-              </div>
-            </div>
-            <span className="text-xs text-slate-500 dark:text-slate-400">+ 1 other device</span>
-          </div>
-        </Section>
+      <div className="min-w-0 flex-1">
+        <p className="text-xs text-slate-500 dark:text-slate-400">
+          Total storage used
+        </p>
+        <p className="mt-1 text-2xl font-semibold tracking-tight text-slate-900 dark:text-slate-100">
+          {(totalSize / 1000000).toFixed(2)} MB
+        </p>
+      </div>
+    </div>
+
+    <div className="mt-4 flex items-center justify-between border-t border-slate-200 pt-3 dark:border-slate-700">
+      <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400">
+        <Files size={16} />
+        <span className="text-xs">Total uploaded files</span>
+      </div>
+
+      <span className="rounded-full bg-blue-100 px-3 py-1 text-xs font-semibold dark:bg-blue-950 dark:text-white">
+        {totalFiles}
+      </span>
+    </div>
+  </div>
+</Section>
+
 
         <Section title="Security" description="Keep your account and files safe.">
           <div className="divide-y divide-slate-100 dark:divide-slate-700">
@@ -200,47 +209,16 @@ function Settings() {
               </div>
               <button
                 className="text-xs font-medium text-blue-700 dark:text-blue-400"
-                onClick={() => setSecurityMessage("Password changes are not available in this frontend-only demo.")}
+              
                 type="button"
               >
                 Change
               </button>
             </div>
-            <div className="flex items-center gap-3 py-3 last:pb-0">
-              <span className="grid h-9 w-9 place-items-center rounded-lg bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300">
-                <ShieldCheck size={16} />
-              </span>
-              <div className="min-w-0 flex-1">
-                <p className="text-xs font-medium text-slate-800 dark:text-slate-100">Two-factor authentication</p>
-                <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">Toggle the visual account preference</p>
-              </div>
-              <button
-                aria-pressed={twoFactor}
-                className={`rounded-full px-2.5 py-1 text-[10px] font-medium ${
-                  twoFactor
-                    ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300"
-                    : "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300"
-                }`}
-                onClick={() => setTwoFactor((enabled) => !enabled)}
-                type="button"
-              >
-                {twoFactor ? "Enabled" : "Not enabled"}
-              </button>
-            </div>
           </div>
-          <p aria-live="polite" className="mt-2 text-xs text-slate-500 dark:text-slate-400">{securityMessage}</p>
         </Section>
       </div>
 
-      <div className="flex items-center gap-3 rounded-xl border border-slate-200 bg-white p-4 dark:border-slate-700 dark:bg-slate-900">
-        <span className="grid h-9 w-9 place-items-center rounded-lg bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300">
-          <UserRound size={17} />
-        </span>
-        <div>
-          <p className="text-xs font-medium text-slate-800 dark:text-slate-100">Personal workspace</p>
-          <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">You’re on the Free plan.</p>
-        </div>
-      </div>
     </div>
   );
 }

@@ -98,5 +98,24 @@ const remove = async (req, res) => {
     });
   }
 };
+const getStorageUsage = async (req, res) => {
+  try {
+    const usage = await fileService.getStorageUsage(req.userId);
 
-module.exports = { upload, list, download,remove };
+    return res.status(200).json({
+      success: true,
+      data: {
+        usedBytes: Number(usage.used_bytes),
+        totalFiles: Number(usage.total_files),
+      },
+    });
+  } catch (error) {
+    console.error("Get storage usage error:", error.message);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to fetch storage usage",
+    });
+  }
+};
+
+module.exports = { upload, list, download,remove,getStorageUsage };

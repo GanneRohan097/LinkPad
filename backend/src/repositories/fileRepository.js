@@ -33,4 +33,16 @@ const deleteFileById = async(fileId,userId) => {
   )
   return result.rows[0];
 }
-module.exports = { createFile, getFilesByUser,getFileById,deleteFileById };
+const getStorageUsageByUser = async (userId) => {
+  const result = await pool.query(
+    `SELECT
+       COALESCE(SUM(file_size), 0) AS used_bytes,
+       COUNT(*) AS total_files
+     FROM files
+     WHERE user_id = $1`,
+    [userId]
+  );
+
+  return result.rows[0];
+};
+module.exports = { createFile, getFilesByUser,getFileById,deleteFileById,getStorageUsageByUser };

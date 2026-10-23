@@ -26,4 +26,7 @@ const deleteFile = async(userId, fileId)=>{
    }
    return result;
 }
-module.exports = { uploadFile, listFiles,downloadFile,deleteFile };
+const getStorageUsage = async (userId) => {
+  return await fileRepository.getStorageUsageByUser(userId);
+};
+module.exports = { uploadFile, listFiles,downloadFile,deleteFile,getStorageUsage };

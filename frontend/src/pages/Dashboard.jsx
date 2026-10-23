@@ -1,4 +1,5 @@
 
+import { useState, useEffect } from "react";
 import { HardDrive } from "lucide-react";
 import QuickActions from "../Components/dashboard/QuickActions";
 import RecentFiles from "../Components/dashboard/RecentFiles";
@@ -9,6 +10,48 @@ import RecentActivity from "../Components/dashboard/RecentActivity";
 function Dashboard() {
   const user = JSON.parse(localStorage.getItem("user"));
   const name = user.user.name;
+  const token = localStorage.getItem("token");
+
+  const [totalSize, setTotalSize] = useState(0);
+  const [totalFiles, setTotalFiles] = useState(0);
+  const [loadingStorage, setLoadingStorage] = useState(true);
+
+  useEffect(() => {
+    async function fetchStorage() {
+      try {
+        const response = await fetch(
+          "https://linkpad-q82m.onrender.com/api/files/storage",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.message || "Failed to fetch storage");
+        }
+
+        setTotalSize(data.data.usedBytes);
+        setTotalFiles(data.data.totalFiles);
+      } catch (error) {
+        console.error("Failed to fetch storage:", error);
+      } finally {
+        setLoadingStorage(false);
+      }
+    }
+
+    fetchStorage();
+  }, [token]);
+
+  function formatStorage(bytes) {
+    if (bytes < 1000) return `${bytes} B`;
+    if (bytes < 1000000) return `${(bytes / 1000).toFixed(2)} KB`;
+    if (bytes < 1000000000) return `${(bytes / 1000000).toFixed(2)} MB`;
+    return `${(bytes / 1000000000).toFixed(2)} GB`;
+  }
 
   return (
     <div className="space-y-8">
@@ -34,23 +77,21 @@ function Dashboard() {
           </p>
         </div>
 
-        <div className="flex items-center gap-2 self-start rounded-lg border border-slate-200 bg-white px-3 py-2 transition-colors dark:border-slate-700 dark:bg-slate-900 sm:self-auto">
-          <span className="grid h-7 w-7 place-items-center rounded-md bg-blue-50 text-blue-700 dark:bg-blue-950 dark:text-blue-400">
-            <HardDrive size={15} />
+        <div className="flex items-center gap-3 self-start rounded-xl border border-slate-200 bg-white px-4 py-3 transition-colors dark:border-slate-700 dark:bg-slate-900 sm:self-auto">
+          <span className="grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-blue-50 text-blue-700 dark:bg-blue-950 dark:text-blue-400">
+            <HardDrive size={19} />
           </span>
 
-          <div>
-            <p className="text-[11px] text-slate-500 dark:text-slate-400">
-              Storage used
+          <div className="min-w-0">
+            <p className="text-xs text-slate-500 dark:text-slate-400">
+              File storage used
             </p>
-            <p className="text-xs font-semibold text-slate-800 dark:text-slate-100">
-              2.4 GB{" "}
-              <span className="font-normal text-slate-400">of 10 GB</span>
+            <p className="mt-1 text-base font-semibold text-slate-900 dark:text-slate-100">
+              {loadingStorage ? "Loading..." : formatStorage(totalSize)}
             </p>
-          </div>
-
-          <div className="ml-3 h-1.5 w-16 overflow-hidden rounded-full bg-slate-100 dark:bg-slate-700">
-            <div className="h-full w-[24%] rounded-full bg-blue-600" />
+            <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+              {totalFiles} {totalFiles === 1 ? "file" : "files"} uploaded
+            </p>
           </div>
         </div>
       </div>

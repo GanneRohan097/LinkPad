@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const authMiddleware = require("../middlewares/authMiddleware");
 const uploadMiddleware = require("../middlewares/upload");
-const { upload, list,download,remove } = require("../controllers/fileController");
+const { upload, list,download,remove,getStorageUsage } = require("../controllers/fileController");
 
 router.use(authMiddleware);
 
@@ -21,4 +21,5 @@ router.post("/", handleUpload, upload);
 router.get("/", list);
 router.get("/:id/download",download)
 router.delete("/:id", remove);
+router.get("/storage", getStorageUsage);
 module.exports = router;
