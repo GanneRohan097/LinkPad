@@ -5,31 +5,38 @@ import {
   FilePlus2,
   Smartphone,
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const actions = [
   {
     label: "Upload file",
     description: "Add something to your files",
     icon: ArrowUpFromLine,
+    path: "/files",
   },
   {
     label: "Create note",
     description: "Capture an idea",
     icon: FilePlus2,
+    path: "/notes",
   },
   {
     label: "Add task",
     description: "Keep track of what's next",
     icon: CheckSquare,
+    path: "/tasks",
   },
   {
-    label: "Connect device",
-    description: "Bring another device online",
+    label: "Your devices",
+    description: "Check your all connected devices",
     icon: Smartphone,
+    path: "/devices",
   },
 ];
 
 function QuickActions() {
+  const navigate = useNavigate();
+
   return (
     <section>
       <div className="mb-3 flex items-center justify-between">
@@ -39,10 +46,11 @@ function QuickActions() {
       </div>
 
       <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
-        {actions.map(({ label, description, icon: Icon }) => (
+        {actions.map(({ label, description, icon: Icon, path }) => (
           <button
             key={label}
-            className="group flex min-h-[86px] items-center gap-3 rounded-xl border border-slate-200 bg-white p-4 text-left transition-colors hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800"
+            onClick={() => navigate(path)}
+            className="group flex min-h-[86px] items-center gap-3 rounded-xl border border-slate-200 bg-white p-4 text-left transition-colors hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800"
             type="button"
           >
             <span className="grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-blue-50 text-blue-700 dark:bg-blue-950 dark:text-blue-400">
