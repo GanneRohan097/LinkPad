@@ -92,7 +92,7 @@ LinkPad follows a layered backend architecture to maintain separation of concern
 
 ### 1. Clone the Repository
 
-    git clone <YOUR_REPOSITORY_URL>
+    git clone <https://github.com/GanneRohan097/LinkPad.git>
     cd LinkPad
 
 ### 2. Install Dependencies
