@@ -179,8 +179,6 @@ Rather than building another cloud storage application, LinkPad aims to combine 
 
 **Ganne Rohan**
 
-B.Tech Computer Science and Engineering
-
 GitHub: [@GanneRohan097](https://github.com/GanneRohan097)
 
 ---
